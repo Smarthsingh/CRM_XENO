@@ -18,6 +18,8 @@ Deployed on **Vercel (frontend)** and **Render (backend)**.
 
 ## 🏗️ Architecture
 
+![Architecture]([https://i.imgur.com/example.png](https://drive.google.com/file/d/1KCGXSsMHC7EaIfWcq32S-EFMZ52kpfV3/view?usp=share_link))
+
 
 ---
 ⚙️ Tech Stack

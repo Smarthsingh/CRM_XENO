@@ -16,13 +16,18 @@ Deployed on **Vercel (frontend)** and **Render (backend)**.
 
 ---
 
-## 🏗️ Architecture
+🔗**Project Link**
+https://crm-xeno-azure.vercel.app/
+
+---
+
+🏗️ **Architecture**
 
 ![Architecture]([https://i.imgur.com/example.png](https://drive.google.com/file/d/1KCGXSsMHC7EaIfWcq32S-EFMZ52kpfV3/view?usp=share_link))
 
 
 ---
-⚙️ Tech Stack
+⚙️**Tech Stack**
 
 Frontend: React (Vite), Material UI, React Router
 
@@ -36,7 +41,7 @@ Other Tools: Swagger API Docs, CORS
 
 ---
 
-📂 Folder Structure
+📂 **Folder Structure**
 
 XCRM/
 │── backend/           # Node.js + Express API
@@ -57,7 +62,7 @@ XCRM/
 
 ---
 
-🚀 Local Setup Instructions
+🚀 **Local Setup Instructions**
 1. Clone the repo
 git clone https://github.com/Smarthsingh/CRM_XENO.git
 cd CRM_XENO
@@ -97,17 +102,17 @@ Now visit 👉 http://localhost:5173
 
 ---
 
-🌐 Deployment
+🌐 **Deployment**
 
-Frontend: Deployed on Vercel
+Frontend: Deployed on Vercel : https://crm-xeno-azure.vercel.app/
 
-Backend: Deployed on Render
+Backend: Deployed on Render : https://crm-xeno-5x14.onrender.com
 
 Make sure to set the .env variables in Vercel Dashboard and Render Dashboard.
  
 ---
 
-⚡ AI Features
+⚡ **AI Features**
 
 Uses Groq AI (LLaMA-3.1-8b-instant) for generating short, creative marketing messages.
 
@@ -115,7 +120,7 @@ Integrated via /api/ai/suggest-message.
 
 ---
 
-🛠️ Known Limitations
+🛠️ **Known Limitations**
 
 Free hosting → Backend (Render free tier) may sleep after inactivity.
 
@@ -125,7 +130,7 @@ MongoDB connection speed may vary on free cluster.
 
 ---
 
-🎥 Demo Video
+🎥 **Demo Video**
 
 👉 [Upload to Google Drive or Loom] and share link here.
 Video should cover:

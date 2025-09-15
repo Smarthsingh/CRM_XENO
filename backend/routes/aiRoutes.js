@@ -1,5 +1,5 @@
-import express from "express";
-import Groq from "groq-sdk";
+const express = require("express");
+const Groq = require("groq-sdk");
 
 const router = express.Router();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -13,7 +13,7 @@ router.post("/suggest-message", async (req, res) => {
     }
 
     const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",  // lightweight + fast
+      model: "llama-3.1-8b-instant",
       messages: [
         { role: "system", content: "You are a creative marketing assistant." },
         { role: "user", content: objective },
@@ -35,4 +35,4 @@ router.post("/suggest-message", async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

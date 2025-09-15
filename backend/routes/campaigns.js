@@ -1,5 +1,10 @@
+const express = require("express");
+const router = express.Router();
+
 const Customer = require('../models/Customer');
+const Campaign = require('../models/Campaign');   // <-- missing in your code
 const CommunicationLog = require('../models/CommunicationLog');
+
 
 // Utility to build MongoDB query from rules
 function buildQuery(rule) {
@@ -64,3 +69,4 @@ router.post('/:id/send', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 }); 
+module.exports = router;

@@ -44,19 +44,33 @@ Other Tools: Swagger API Docs, CORS
 📂 **Folder Structure**
 
 XCRM/
-│── backend/           # Node.js + Express API
-│   ├── server.js
+
+│── backend/  # Node.js + Express API
+
+│  ├── server.js
+
 │   ├── routes/
+
 │   ├── models/
+
 │   └── config/
+
 │
+
 │── frontend/          # React + Vite frontend
+
 │   ├── src/
+
 │   │   ├── components/
+
 │   │   ├── App.jsx
+
 │   │   └── ...
+
 │   └── vite.config.js
+
 │
+
 │── README.md
 
 

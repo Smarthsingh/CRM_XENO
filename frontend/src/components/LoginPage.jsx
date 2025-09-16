@@ -2,8 +2,8 @@ import React from 'react';
 import { Box, Card, CardContent, Typography, Button, Stack } from '@mui/material';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
+import Logo from "../components/Logo"; 
 
-const patternBg = `url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" fill="white"/><rect x="20" width="1" height="40" fill="%23e0e7ef"/><rect y="20" width="40" height="1" fill="%23e0e7ef"/></svg>')`;
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -21,9 +21,8 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (data.token) {
-        // Save backend-issued token
         localStorage.setItem("app_token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user)); // optional, store user info
+        localStorage.setItem("user", JSON.stringify(data.user));
         navigate("/");
       } else {
         alert("Google login failed");
@@ -41,50 +40,142 @@ export default function LoginPage() {
   };
 
   return (
-    <Box sx={{
-      minHeight: '100vh',
-      width: '100vw',
-      background: `${patternBg}, linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)`,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}>
-      <GoogleOAuthProvider clientId={clientId}>
-        <Card sx={{ minWidth: 350, maxWidth: 400, p: 3, boxShadow: 6, borderRadius: 3 }}>
-          <CardContent>
-            <Stack spacing={3} alignItems="center">
-              <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: '#1a73e8' }}>
-                XCRM
-              </Typography>
-              <Typography variant="subtitle1" gutterBottom sx={{ color: '#5f6368', mb: 4 }}>
-                Your Mini CRM for Smart Customer Management
-              </Typography>
-              
-              {/* Google Login */}
-              <GoogleLogin
-                onSuccess={handleLoginSuccess}
-                onError={() => alert('Google Login Failed')}
-                width="100%"
-                theme="filled_blue"
-                text="signin_with"
-                shape="pill"
-                logo_alignment="left"
-              />
+    <Box
+      sx={{
+        minHeight: "100vh",
+        width: "100vw",
+        display: "flex",
+        overflow: "hidden",
+      }}
+    >
+      {/* LEFT SIDE - Illustration */}
+      <Box
+        sx={{
+          flex: 1,
+          display: { xs: "none", md: "flex" },
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          p: 6,
+          background: "linear-gradient(135deg, #1a73e8 0%, #6dd5ed 100%)",
+          color: "#fff",
+          textAlign: "center",
+        }}
+      >
+        <Typography
+          variant="h3"
+          sx={{
+            fontWeight: 800,
+            mb: 3,
+          }}
+        >
+          Welcome to <span style={{ color: "#ffd700" }}>XCRM</span>
+        </Typography>
+        <Typography
+          variant="h6"
+          sx={{ maxWidth: 400, lineHeight: 1.6, opacity: 0.9 }}
+        >
+          Manage customers smarter, run campaigns with ease, and unlock growth 🚀
+        </Typography>
 
-              {/* Guest Mode */}
-              <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                sx={{ mt: 2, fontWeight: 600, borderRadius: 2, textTransform: 'none' }}
-                onClick={handleEnter}
-              >
-                Enter as Guest
-              </Button>
-            </Stack>
-          </CardContent>
-        </Card>
-      </GoogleOAuthProvider>
+        {/* Illustration (you can replace with an SVG or image) */}
+        {/* <Box
+          component="img"
+          src="https://cdn.dribbble.com/users/25514/screenshots/15014243/media/040f6294c60d7cfbe671efbb3488da26.png?compress=1&resize=1000x750"
+          alt="CRM Illustration"
+          sx={{
+            maxWidth: 420,
+            width: "100%",
+            mt: 4,
+            borderRadius: 3,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+          }}
+        /> */}
+      </Box>
+
+      {/* RIGHT SIDE - Login Form */}
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#f9fbff",
+        }}
+      >
+        <GoogleOAuthProvider clientId={clientId}>
+          <Card
+            sx={{
+              minWidth: 360,
+              maxWidth: 420,
+              p: 3,
+              borderRadius: 4,
+              backdropFilter: "blur(16px)",
+              background: "rgba(255,255,255,0.9)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
+              transition: "transform 0.3s",
+              "&:hover": { transform: "scale(1.02)" },
+            }}
+          >
+            <CardContent>
+              <Stack spacing={3} alignItems="center">
+                {/* Logo / Brand */}
+                <Stack direction="row" alignItems="center" spacing={1}>
+  <Logo size={40} />
+  <Typography
+    variant="h4"
+    sx={{
+      fontWeight: 800,
+      background: "linear-gradient(90deg, #1a73e8, #6dd5ed)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+    }}
+  >
+    XCRM
+  </Typography>
+</Stack>
+
+                <Typography
+                  variant="subtitle1"
+                  sx={{ color: "#5f6368", textAlign: "center", mb: 2 }}
+                >
+                  Your Mini CRM for Smart Customer Management
+                </Typography>
+
+                {/* Google Login */}
+                <GoogleLogin
+                  onSuccess={handleLoginSuccess}
+                  onError={() => alert("Google Login Failed")}
+                  width="100%"
+                  theme="filled_blue"
+                  text="signin_with"
+                  shape="pill"
+                  logo_alignment="left"
+                />
+
+                {/* Guest Mode */}
+                <Button
+                  variant="contained"
+                  fullWidth
+                  sx={{
+                    mt: 2,
+                    fontWeight: 600,
+                    borderRadius: 3,
+                    textTransform: "none",
+                    background: "linear-gradient(90deg, #1a73e8, #6dd5ed)",
+                    "&:hover": {
+                      background: "linear-gradient(90deg, #1765c7, #4fc3e8)",
+                    },
+                  }}
+                  onClick={handleEnter}
+                >
+                  Enter as Guest
+                </Button>
+              </Stack>
+            </CardContent>
+          </Card>
+        </GoogleOAuthProvider>
+      </Box>
     </Box>
   );
 }

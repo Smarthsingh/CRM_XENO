@@ -7,16 +7,8 @@ import {
   CardContent,
   CircularProgress,
   Alert,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Tooltip,
   Stack,
   Divider,
-  Paper,
 } from '@mui/material';
 import { TrendingUp, Users, Clock, BarChart2, Link2 } from 'lucide-react';
 import {
@@ -34,6 +26,7 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+// Labels
 const statLabels = {
   mean: 'Average',
   median: 'Typical',
@@ -42,45 +35,48 @@ const statLabels = {
   stddev: 'Variation',
 };
 
+// Metrics meta
 const metricMeta = {
   spend: {
     label: 'Customer Spend',
-    icon: <TrendingUp color="#22c55e" size={32} />,
+    icon: <TrendingUp color="#22c55e" size={28} />,
     color: '#22c55e',
     unit: '₹',
   },
   visits: {
     label: 'Customer Visits',
-    icon: <Users color="#3b82f6" size={32} />,
+    icon: <Users color="#3b82f6" size={28} />,
     color: '#3b82f6',
     unit: '',
   },
   recency: {
     label: 'Recency (days since last active)',
-    icon: <Clock color="#f59e42" size={32} />,
+    icon: <Clock color="#f59e42" size={28} />,
     color: '#f59e42',
     unit: '',
   },
 };
 
+// Correlation meta
 const correlationMeta = {
   spend_vs_visits: {
     label: 'Spend vs Visits',
-    icon: <Link2 color="#3b82f6" size={28} />,
+    icon: <Link2 color="#3b82f6" size={24} />,
     color: '#3b82f6',
   },
   spend_vs_recency: {
     label: 'Spend vs Recency',
-    icon: <Link2 color="#8b5cf6" size={28} />,
+    icon: <Link2 color="#8b5cf6" size={24} />,
     color: '#8b5cf6',
   },
   visits_vs_recency: {
     label: 'Visits vs Recency',
-    icon: <Link2 color="#f59e42" size={28} />,
+    icon: <Link2 color="#f59e42" size={24} />,
     color: '#f59e42',
   },
 };
 
+// Helper for correlation interpretation
 const interpretCorrelation = (value) => {
   if (Math.abs(value) > 0.7) return 'Strong';
   if (Math.abs(value) > 0.4) return 'Moderate';
@@ -88,123 +84,118 @@ const interpretCorrelation = (value) => {
   return 'None';
 };
 
+// Stats Block
+const statIcons = {
+  mean: <TrendingUp size={18} color="#22c55e" />,
+  median: <Users size={18} color="#3b82f6" />,
+  min: <Clock size={18} color="#f59e42" />,
+  max: <BarChart2 size={18} color="#8b5cf6" />,
+  stddev: <Link2 size={18} color="#ef4444" />,
+};
+
 const StatsBlock = ({ stats, unit }) => (
-  <Stack direction="row" spacing={3} justifyContent="center" alignItems="center" sx={{ my: 1 }}>
+  <Grid container spacing={2} justifyContent="center" sx={{ my: 2 }}>
     {Object.entries(stats).map(([key, value]) => (
-      <Box key={key} sx={{ textAlign: 'center', minWidth: 80 }}>
-        <Typography variant="caption" color="text.secondary">{statLabels[key]}</Typography>
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          {unit}{typeof value === 'number' ? value.toFixed(2) : value}
-        </Typography>
-      </Box>
+      <Grid item xs={6} sm={4} md={2.4} key={key}>
+        <Card
+          sx={{
+            p: 2,
+            borderRadius: 3,
+            textAlign: "center",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+          }}
+        >
+          <Stack direction="column" alignItems="center" spacing={1}>
+            {statIcons[key]}
+            <Typography variant="caption" color="text.secondary">
+              {statLabels[key]}
+            </Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              {unit}
+              {typeof value === "number" ? value.toFixed(2) : value}
+            </Typography>
+          </Stack>
+        </Card>
+      </Grid>
     ))}
-  </Stack>
+  </Grid>
 );
 
-const TopBottomTable = ({ data, metric, unit }) => (
-  <Box sx={{ my: 2 }}>
-    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>Top 5</Typography>
-    <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 1 }}>
-      <Table size="small">
-        <TableHead>
-          <TableRow sx={{ background: '#f6fafd' }}>
-            <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
-            <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
-            <TableCell sx={{ fontWeight: 600 }}>Phone</TableCell>
-            <TableCell align="right" sx={{ fontWeight: 600 }}>{unit ? metricMeta[metric].label : ''}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.top.map((row, idx) => (
-            <TableRow key={idx} hover sx={{ '&:hover': { background: '#e3f0fc' } }}>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.email}</TableCell>
-              <TableCell>{row.phone}</TableCell>
-              <TableCell align="right">{unit}{row.value}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>Bottom 5</Typography>
-    <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 1 }}>
-      <Table size="small">
-        <TableHead>
-          <TableRow sx={{ background: '#f6fafd' }}>
-            <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
-            <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
-            <TableCell sx={{ fontWeight: 600 }}>Phone</TableCell>
-            <TableCell align="right" sx={{ fontWeight: 600 }}>{unit ? metricMeta[metric].label : ''}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.bottom.map((row, idx) => (
-            <TableRow key={idx} hover sx={{ '&:hover': { background: '#e3f0fc' } }}>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.email}</TableCell>
-              <TableCell>{row.phone}</TableCell>
-              <TableCell align="right">{unit}{row.value}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  </Box>
-);
-
+// Histogram Chart
 const Histogram = ({ data, title, color }) => (
   <Box sx={{ my: 2 }}>
-    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
       <BarChart2 size={20} color={color} />
-      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>{title} Histogram</Typography>
+      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+        {title} Distribution
+      </Typography>
     </Stack>
-    <Box sx={{ height: 220, width: '100%' }}>
+    <Box sx={{ height: 280, width: '100%' }}>
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
-          <XAxis dataKey="range" angle={-30} textAnchor="end" interval={0} height={50} />
+        <BarChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 60 }}>
+          <XAxis
+            dataKey="range"
+            angle={-20}
+            interval="preserveStartEnd"
+            height={60}
+            tick={{ fontSize: 12, fill: "#444" }}
+            tickFormatter={(val) =>
+              val.length > 10 ? val.slice(0, 10) + "…" : val
+            }
+          />
           <YAxis allowDecimals={false} />
-          <RechartsTooltip 
-            contentStyle={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          <RechartsTooltip
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
               borderRadius: '8px',
               border: 'none',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             }}
           />
-          <Bar dataKey="count" fill={color} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="count" fill={color} radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </Box>
   </Box>
 );
 
+// Trend Chart
 const TrendChart = ({ data, title, color }) => (
   <Box sx={{ my: 2 }}>
-    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
       <TrendingUp size={20} color={color} />
-      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>{title} Trend (last 12 months)</Typography>
+      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+        {title} Trend (12 months)
+      </Typography>
     </Stack>
-    <Box sx={{ height: 220, width: '100%' }}>
+    <Box sx={{ height: 280, width: '100%' }}>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-          <XAxis dataKey="month" interval={0} angle={-30} textAnchor="end" height={50} />
+        <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 60 }}>
+          <XAxis
+            dataKey="month"
+            interval="preserveStartEnd"
+            angle={-20}
+            height={60}
+            tick={{ fontSize: 12, fill: "#444" }}
+          />
           <YAxis allowDecimals={false} />
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <RechartsTooltip 
-            contentStyle={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          <RechartsTooltip
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
               borderRadius: '8px',
               border: 'none',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             }}
           />
           <Legend />
-          <Line 
-            type="monotone" 
-            dataKey="value" 
-            stroke={color} 
-            strokeWidth={2}
-            dot={{ fill: color, strokeWidth: 2 }}
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={color}
+            strokeWidth={3}
+            dot={{ r: 5, fill: color }}
+            activeDot={{ r: 7, stroke: '#fff', strokeWidth: 2 }}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -212,29 +203,18 @@ const TrendChart = ({ data, title, color }) => (
   </Box>
 );
 
+// Correlation Card
 const CorrelationCard = ({ value, meta }) => (
-  <Card sx={{ 
-    mb: 2, 
-    background: `linear-gradient(135deg, ${meta.color}15 0%, ${meta.color}30 100%)`,
-    borderRadius: 3,
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-    minHeight: 120,
-    transition: 'transform 0.2s',
-    '&:hover': {
-      transform: 'translateY(-2px)',
-    }
-  }}>
+  <Card sx={{ borderRadius: 4, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', p: 2 }}>
     <CardContent>
-      <Stack direction="row" alignItems="center" spacing={2}>
+      <Stack direction="row" spacing={2} alignItems="center">
         {meta.icon}
         <Box>
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: meta.color }}>{meta.label}</Typography>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: meta.color }}>{value.toFixed(2)} ({interpretCorrelation(value)})</Typography>
-          <Typography variant="caption" color="text.secondary">
-            {interpretCorrelation(value) === 'Strong' && 'There is a strong relationship.'}
-            {interpretCorrelation(value) === 'Moderate' && 'There is a moderate relationship.'}
-            {interpretCorrelation(value) === 'Weak' && 'There is a weak relationship.'}
-            {interpretCorrelation(value) === 'None' && 'No significant relationship.'}
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: meta.color }}>
+            {meta.label}
+          </Typography>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: meta.color }}>
+            {value.toFixed(2)} ({interpretCorrelation(value)})
           </Typography>
         </Box>
       </Stack>
@@ -242,32 +222,68 @@ const CorrelationCard = ({ value, meta }) => (
   </Card>
 );
 
+// Metric Section
+// Metric Section
 const MetricSection = ({ metric, data }) => {
   const meta = metricMeta[metric];
   return (
-    <Card sx={{ mb: 4, p: 2, borderRadius: 3, boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)', background: 'white' }}>
-      <CardContent>
-        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+    <Card
+      sx={{
+        mb: 3,                // smaller bottom margin
+        p: 2.5,               // reduced padding
+        borderRadius: 3,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+      }}
+    >
+      <CardContent sx={{ p: 0 }}>   {/* remove extra padding */}
+        {/* Header */}
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
           {meta.icon}
-          <Typography variant="h5" sx={{ fontWeight: 700, color: meta.color }}>{meta.label}</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: meta.color }}>
+            {meta.label}
+          </Typography>
         </Stack>
         <Divider sx={{ mb: 2 }} />
+
+        {/* Stats Row */}
         <StatsBlock stats={data.stats} unit={meta.unit} />
-        <Grid container spacing={3}>
+
+        {/* Charts */}
+        <Grid container spacing={2} alignItems="stretch" justifyContent="center">
           <Grid item xs={12} md={6}>
-            <Histogram data={data.hist} title={meta.label} color={meta.color} />
+            <Box
+              sx={{
+                p: 1.5,
+                background: '#fff',
+                borderRadius: 2,
+                height: 240,   // reduced
+                boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+              }}
+            >
+              <Histogram data={data.hist} title={meta.label} color={meta.color} />
+            </Box>
           </Grid>
           {data.trend && (
             <Grid item xs={12} md={6}>
-              <TrendChart data={data.trend} title={meta.label} color={meta.color} />
+              <Box
+                sx={{
+                  p: 1.5,
+                  background: '#fff',
+                  borderRadius: 2,
+                  height: 240,   // reduced
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                }}
+              >
+                <TrendChart data={data.trend} title={meta.label} color={meta.color} />
+              </Box>
             </Grid>
           )}
         </Grid>
-        <TopBottomTable data={data.topBottom} metric={metric} unit={meta.unit} />
       </CardContent>
     </Card>
   );
 };
+
 
 const SegmentationPage = () => {
   const [analytics, setAnalytics] = useState(null);
@@ -282,9 +298,7 @@ const SegmentationPage = () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_URL}/api/segments/analytics`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch analytics');
-      }
+      if (!response.ok) throw new Error('Failed to fetch analytics');
       const data = await response.json();
       setAnalytics(data);
       setError(null);
@@ -296,22 +310,18 @@ const SegmentationPage = () => {
   };
 
   if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto', p: 3, background: '#f6fafd', minHeight: '100vh' }}>
+    <Box sx={{ width: '100%', maxWidth: 1250, mx: 'auto', p: 4, background: '#f9fbff', minHeight: '100vh' }}>
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      <Box sx={{ width: '100%', mb: 4, textAlign: 'center' }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: '#1a73e8' }}>
+      <Box sx={{ textAlign: 'center', mb: 5 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, color: '#1a73e8', letterSpacing: '0.5px', mb: 1 }}>
           Segmentation Analytics
         </Typography>
-        <Typography variant="subtitle1" gutterBottom sx={{ color: '#5f6368' }}>
-          Analyze your customer base with automatic segmentation, stats, and trends for smarter targeting.
+        <Typography variant="subtitle1" sx={{ color: '#5f6368' }}>
+          Smarter targeting through automatic segmentation, trends, and correlations.
         </Typography>
       </Box>
       {analytics && (
@@ -319,13 +329,10 @@ const SegmentationPage = () => {
           <MetricSection metric="spend" data={analytics.spend} />
           <MetricSection metric="visits" data={analytics.visits} />
           <MetricSection metric="recency" data={analytics.recency} />
-          <Typography variant="h5" sx={{ mt: 4, mb: 2, fontWeight: 700 }}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Link2 size={24} color="#1a73e8" />
-              <span>Correlations & Insights</span>
-            </Stack>
+          <Typography variant="h5" sx={{ mt: 4, mb: 3, fontWeight: 700, color: '#1a73e8' }}>
+            Correlations & Insights
           </Typography>
-          <Grid container spacing={2}>
+          <Grid container spacing={3}>
             {Object.entries(analytics.correlations).map(([key, value]) => (
               <Grid item xs={12} md={4} key={key}>
                 <CorrelationCard value={value} meta={correlationMeta[key]} />

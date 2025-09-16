@@ -49,24 +49,51 @@ function RuleGroup({ group, onChange, onRemove, isRoot = false }) {
     onChange({ ...group, conditions: [...group.conditions, defaultGroup()] });
   };
   const handleGroupChange = (idx, newGroup) => {
-    onChange({ ...group, conditions: group.conditions.map((c, i) => i === idx ? newGroup : c) });
+    onChange({
+      ...group,
+      conditions: group.conditions.map((c, i) => (i === idx ? newGroup : c)),
+    });
   };
   const handleRemoveGroup = (idx) => {
-    onChange({ ...group, conditions: group.conditions.filter((_, i) => i !== idx) });
+    onChange({
+      ...group,
+      conditions: group.conditions.filter((_, i) => i !== idx),
+    });
   };
+
   return (
-    <Card variant={isRoot ? 'outlined' : 'elevation'} sx={{ mb: 2, ml: isRoot ? 0 : 3, background: isRoot ? '#f5f7fa' : '#fff' }}>
+    <Card
+      variant={isRoot ? 'outlined' : 'elevation'}
+      sx={{
+        mb: 2,
+        ml: isRoot ? 0 : 3,
+        background: isRoot ? '#f9fbfd' : '#fff',
+        borderRadius: 3,
+        boxShadow: isRoot ? 'none' : '0px 2px 8px rgba(0,0,0,0.05)',
+      }}
+    >
       <CardContent>
         <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
           <FormControl sx={{ minWidth: 100 }} size="small">
             <InputLabel>Logic</InputLabel>
-            <Select value={group.logic} label="Logic" onChange={e => handleLogicChange(e.target.value)}>
+            <Select
+              value={group.logic}
+              label="Logic"
+              onChange={(e) => handleLogicChange(e.target.value)}
+            >
               <MenuItem value="AND">AND</MenuItem>
               <MenuItem value="OR">OR</MenuItem>
             </Select>
           </FormControl>
           {!isRoot && (
-            <Button color="error" onClick={onRemove} size="small" startIcon={<DeleteIcon />}>Remove Group</Button>
+            <Button
+              color="error"
+              onClick={onRemove}
+              size="small"
+              startIcon={<DeleteIcon />}
+            >
+              Remove Group
+            </Button>
           )}
         </Stack>
         {group.conditions.map((cond, idx) =>
@@ -74,41 +101,85 @@ function RuleGroup({ group, onChange, onRemove, isRoot = false }) {
             <RuleGroup
               key={idx}
               group={cond}
-              onChange={newGroup => handleGroupChange(idx, newGroup)}
+              onChange={(newGroup) => handleGroupChange(idx, newGroup)}
               onRemove={() => handleRemoveGroup(idx)}
             />
           ) : (
-            <Box key={idx} sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
+            <Box
+              key={idx}
+              sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}
+            >
               <FormControl sx={{ minWidth: 120 }} size="small">
                 <InputLabel>Field</InputLabel>
-                <Select value={cond.field} label="Field" onChange={e => handleConditionChange(idx, 'field', e.target.value)}>
-                  {fields.map(f => <MenuItem key={f.value} value={f.value}>{f.label}</MenuItem>)}
+                <Select
+                  value={cond.field}
+                  label="Field"
+                  onChange={(e) =>
+                    handleConditionChange(idx, 'field', e.target.value)
+                  }
+                >
+                  {fields.map((f) => (
+                    <MenuItem key={f.value} value={f.value}>
+                      {f.label}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
               <FormControl sx={{ minWidth: 80 }} size="small">
                 <InputLabel>Operator</InputLabel>
-                <Select value={cond.operator} label="Operator" onChange={e => handleConditionChange(idx, 'operator', e.target.value)}>
-                  {operators.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
+                <Select
+                  value={cond.operator}
+                  label="Operator"
+                  onChange={(e) =>
+                    handleConditionChange(idx, 'operator', e.target.value)
+                  }
+                >
+                  {operators.map((o) => (
+                    <MenuItem key={o.value} value={o.value}>
+                      {o.label}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
               <TextField
                 label="Value"
                 type="number"
                 value={cond.value}
-                onChange={e => handleConditionChange(idx, 'value', e.target.value)}
+                onChange={(e) =>
+                  handleConditionChange(idx, 'value', e.target.value)
+                }
                 size="small"
                 required
                 sx={{ maxWidth: 100 }}
               />
               {group.conditions.length > 1 && (
-                <IconButton onClick={() => handleRemoveCondition(idx)} color="error"><DeleteIcon /></IconButton>
+                <IconButton
+                  onClick={() => handleRemoveCondition(idx)}
+                  color="error"
+                >
+                  <DeleteIcon />
+                </IconButton>
               )}
             </Box>
           )
         )}
         <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-          <Button onClick={handleAddCondition} variant="outlined" size="small" startIcon={<AddCircleOutlineIcon />}>Add Condition</Button>
-          <Button onClick={handleAddGroup} variant="outlined" size="small" startIcon={<AddCircleOutlineIcon />}>Add Group</Button>
+          <Button
+            onClick={handleAddCondition}
+            variant="outlined"
+            size="small"
+            startIcon={<AddCircleOutlineIcon />}
+          >
+            Add Condition
+          </Button>
+          <Button
+            onClick={handleAddGroup}
+            variant="outlined"
+            size="small"
+            startIcon={<AddCircleOutlineIcon />}
+          >
+            Add Group
+          </Button>
         </Stack>
       </CardContent>
     </Card>
@@ -148,14 +219,14 @@ export default function CampaignForm({ onCreated, editData }) {
     setLoading(true);
     const cleanRules = JSON.parse(JSON.stringify(rules));
     function clean(group) {
-      group.conditions = group.conditions.map(c =>
+      group.conditions = group.conditions.map((c) =>
         c.conditions ? clean(c) : { ...c, value: Number(c.value) }
       );
       return group;
     }
     if (!cleanRules[0]) {
       setLoading(false);
-      alert("Please add at least one rule group.");
+      alert('Please add at least one rule group.');
       return;
     }
     const rulesObj = clean(cleanRules[0]);
@@ -174,14 +245,14 @@ export default function CampaignForm({ onCreated, editData }) {
     setLoading(true);
     const cleanRules = JSON.parse(JSON.stringify(rules));
     function clean(group) {
-      group.conditions = group.conditions.map(c =>
+      group.conditions = group.conditions.map((c) =>
         c.conditions ? clean(c) : { ...c, value: Number(c.value) }
       );
       return group;
     }
     if (!cleanRules[0]) {
       setLoading(false);
-      alert("Please add at least one rule group.");
+      alert('Please add at least one rule group.');
       return;
     }
     const rulesObj = clean(cleanRules[0]);
@@ -208,16 +279,73 @@ export default function CampaignForm({ onCreated, editData }) {
   };
 
   return (
-    <Paper sx={{ p: 3, mb: 4, maxWidth: 700 }}>
-      <Typography variant="h6" mb={2}>{editData ? 'Edit Campaign' : 'Create Campaign'}</Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <TextField label="Campaign Name" value={name} onChange={e => setName(e.target.value)} required />
-        {rules[0] && <RuleGroup group={rules[0]} onChange={newGroup => setRules([newGroup])} isRoot />}
-        <Button variant="outlined" onClick={handlePreview} disabled={loading}>Preview Audience</Button>
-        {audience !== null && <Typography>Audience Size: <b>{audience}</b></Typography>}
-        <Button type="submit" variant="contained" disabled={loading || !name}>
-          {editData ? 'Update Campaign' : 'Create Campaign'}
-        </Button>
+    <Paper
+      sx={{
+        p: 4,
+        borderRadius: 4,
+        boxShadow: 4,
+        background: 'rgba(255,255,255,0.9)',
+        backdropFilter: 'blur(10px)',
+      }}
+    >
+      <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
+        {editData ? '✏️ Edit Campaign' : '🚀 Create Campaign'}
+      </Typography>
+
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+      >
+        <TextField
+          label="Campaign Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          fullWidth
+        />
+
+        {rules[0] && (
+          <RuleGroup group={rules[0]} onChange={(newGroup) => setRules([newGroup])} isRoot />
+        )}
+
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="outlined"
+            onClick={handlePreview}
+            disabled={loading}
+            sx={{ borderRadius: 3 }}
+          >
+            Preview Audience
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={loading || !name}
+            sx={{
+              borderRadius: 3,
+              background: 'linear-gradient(90deg, #1976d2, #42a5f5)',
+            }}
+          >
+            {editData ? 'Update Campaign' : 'Create Campaign'}
+          </Button>
+        </Stack>
+
+        {audience !== null && (
+          <Paper
+            sx={{
+              p: 2,
+              mt: 2,
+              borderRadius: 3,
+              background: '#f1f6fd',
+              border: '1px solid #cfe0fc',
+            }}
+          >
+            <Typography>
+              📊 Audience Size: <b>{audience}</b>
+            </Typography>
+          </Paper>
+        )}
       </Box>
     </Paper>
   );

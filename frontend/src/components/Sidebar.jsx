@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Drawer, Box, IconButton, Tooltip, Stack, Divider } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import { Drawer, Box, IconButton, Tooltip, Stack, Divider, Typography } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
@@ -8,8 +7,9 @@ import ContactsIcon from '@mui/icons-material/Contacts';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Logo from '../components/Logo'; // ✅ your logo component
 
-const sidebarWidth = 72;
+const sidebarWidth = 80;
 
 const navItems = [
   { label: 'Home', icon: <HomeIcon />, to: '/' },
@@ -37,7 +37,7 @@ export default function Sidebar() {
         [`& .MuiDrawer-paper`]: {
           width: sidebarWidth,
           boxSizing: 'border-box',
-          background: '#1976d2',
+          background: 'linear-gradient(180deg, #1a73e8, #0d47a1)', // gradient blue
           color: '#fff',
           borderRight: 'none',
           display: 'flex',
@@ -48,49 +48,70 @@ export default function Sidebar() {
         },
       }}
     >
-      <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {/* XCRM Logo/Name */}
-        <Box sx={{ mb: 2, mt: 1 }}>
-          <Tooltip title="XCRM" placement="right">
-            <Box sx={{ fontWeight: 900, fontSize: 22, letterSpacing: 1, color: '#fff', fontFamily: 'Montserrat, sans-serif', textAlign: 'center' }}>
-              XCRM
-            </Box>
-          </Tooltip>
-        </Box>
-        {/* Hamburger Button (for design/future expansion) */}
-        
-        <Divider sx={{ width: 32, bgcolor: 'rgba(255,255,255,0.15)', mb: 2 }} />
-        {/* Nav Icons */}
-        <Stack spacing={2} alignItems="center">
-          {navItems.map((item) => (
+      {/* Logo / Brand */}
+      <Box sx={{ textAlign: 'center', mb: 3, mt: 1 }}>
+        <Logo size={40} /> {/* ✅ use your logo component */}
+        <Typography
+          sx={{
+            fontWeight: 900,
+            fontSize: 16,
+            letterSpacing: 1,
+            fontFamily: 'Montserrat, sans-serif',
+          }}
+        >
+          XCRM
+        </Typography>
+      </Box>
+
+      <Divider sx={{ width: 32, bgcolor: 'rgba(255,255,255,0.2)', mb: 2 }} />
+
+      {/* Navigation */}
+      <Stack spacing={2} alignItems="center" sx={{ flexGrow: 1 }}>
+        {navItems.map((item) => {
+          const active = location.pathname === item.to;
+          return (
             <Tooltip title={item.label} placement="right" key={item.label}>
               <IconButton
                 component={Link}
                 to={item.to}
                 sx={{
-                  color: location.pathname === item.to ? '#1976d2' : '#fff',
-                  background: location.pathname === item.to ? '#fff' : 'transparent',
-                  boxShadow: location.pathname === item.to ? '0 2px 8px 0 rgba(26,115,232,0.08)' : 'none',
-                  borderRadius: 2,
-                  transition: 'all 0.2s',
+                  color: active ? '#1a73e8' : '#fff',
+                  background: active ? '#fff' : 'transparent',
+                  boxShadow: active ? '0 4px 12px rgba(0,0,0,0.15)' : 'none',
+                  borderRadius: 3,
+                  transition: 'all 0.25s ease',
                   '&:hover': {
-                    background: 'rgba(255,255,255,0.12)',
-                    color: '#90caf9',
+                    background: active
+                      ? '#f1f5ff'
+                      : 'rgba(255,255,255,0.15)',
+                    color: active ? '#1a73e8' : '#e3f2fd',
+                    transform: 'scale(1.05)',
                   },
-                  width: 44,
-                  height: 44,
+                  width: 48,
+                  height: 48,
                 }}
               >
                 {item.icon}
               </IconButton>
             </Tooltip>
-          ))}
-        </Stack>
-      </Box>
-      {/* Logout at the bottom */}
-      <Box sx={{ mb: 1 }}>
+          );
+        })}
+      </Stack>
+
+      {/* Logout */}
+      <Box sx={{ mb: 2 }}>
         <Tooltip title="Logout" placement="right">
-          <IconButton color="inherit" onClick={handleLogout} sx={{ color: '#fff' }}>
+          <IconButton
+            onClick={handleLogout}
+            sx={{
+              color: '#fff',
+              transition: 'all 0.2s',
+              '&:hover': {
+                color: '#ff5252',
+                background: 'rgba(255,255,255,0.15)',
+              },
+            }}
+          >
             <LogoutIcon />
           </IconButton>
         </Tooltip>

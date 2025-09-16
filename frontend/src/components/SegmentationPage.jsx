@@ -16,11 +16,23 @@ import {
   Tooltip,
   Stack,
   Divider,
-  useTheme,
   Paper,
 } from '@mui/material';
-import { TrendingUp, Users, Clock, BarChart2, ArrowUpRight, ArrowDownRight, Info, Link2 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip as RechartsTooltip, LineChart, Line, CartesianGrid, Legend } from 'recharts';
+import { TrendingUp, Users, Clock, BarChart2, Link2 } from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+  LineChart,
+  Line,
+  CartesianGrid,
+  Legend,
+} from 'recharts';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const statLabels = {
   mean: 'Average',
@@ -233,13 +245,7 @@ const CorrelationCard = ({ value, meta }) => (
 const MetricSection = ({ metric, data }) => {
   const meta = metricMeta[metric];
   return (
-    <Card sx={{ 
-      mb: 4, 
-      p: 2, 
-      borderRadius: 3,
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-      background: 'white',
-    }}>
+    <Card sx={{ mb: 4, p: 2, borderRadius: 3, boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)', background: 'white' }}>
       <CardContent>
         <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
           {meta.icon}
@@ -275,7 +281,7 @@ const SegmentationPage = () => {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:4000/api/segments/analytics');
+      const response = await fetch(`${API_URL}/api/segments/analytics`);
       if (!response.ok) {
         throw new Error('Failed to fetch analytics');
       }
@@ -298,17 +304,8 @@ const SegmentationPage = () => {
   }
 
   return (
-    <Box sx={{ 
-      width: '100%', 
-      maxWidth: 1200, 
-      mx: 'auto', 
-      p: 3,
-      background: '#f6fafd',
-      minHeight: '100vh',
-    }}>
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
-      )}
+    <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto', p: 3, background: '#f6fafd', minHeight: '100vh' }}>
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       <Box sx={{ width: '100%', mb: 4, textAlign: 'center' }}>
         <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: '#1a73e8' }}>
           Segmentation Analytics
@@ -341,4 +338,4 @@ const SegmentationPage = () => {
   );
 };
 
-export default SegmentationPage; 
+export default SegmentationPage;

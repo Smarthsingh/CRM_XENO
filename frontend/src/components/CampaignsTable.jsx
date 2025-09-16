@@ -3,7 +3,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Paper, Typography, CircularProgress, Button, Dialog, DialogContent,
   IconButton, Stack, Tooltip, DialogTitle, DialogActions, Box,
-  Snackbar, Alert, Chip, List, ListItem, ListItemText
+  Snackbar, Alert, Chip, Divider, TextField
 } from '@mui/material';
 import CampaignForm from './CampaignForm';
 import EditIcon from '@mui/icons-material/Edit';
@@ -11,6 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,9 +19,17 @@ export default function CampaignsTable() {
   const [campaigns, setCampaigns] = useState([]);
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
+
   const [open, setOpen] = useState(false);
   const [editCampaign, setEditCampaign] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+
+  const [sendOpen, setSendOpen] = useState(false);
+  const [sendCampaign, setSendCampaign] = useState(null);
+  const [message, setMessage] = useState('');
+  const [aiSuggestions, setAiSuggestions] = useState([]);
+  const [aiLoading, setAiLoading] = useState(false);
+
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   const fetchCampaigns = () => {
@@ -66,6 +75,45 @@ export default function CampaignsTable() {
       fetchStats();
     } catch {
       setSnackbar({ open: true, message: '❌ Failed to delete.', severity: 'error' });
+    }
+  };
+
+  const handleSend = async () => {
+    if (!sendCampaign || !message.trim()) return;
+    try {
+      await fetch(`${API_URL}/api/campaigns/${sendCampaign._id}/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+      setSnackbar({ open: true, message: "✅ Campaign sent successfully!", severity: "success" });
+      setSendOpen(false);
+      setMessage('');
+      setAiSuggestions([]);
+      fetchStats();
+    } catch {
+      setSnackbar({ open: true, message: "❌ Failed to send campaign", severity: "error" });
+    }
+  };
+
+  const getAISuggestions = async () => {
+    if (!sendCampaign) return;
+    setAiLoading(true);
+    setAiSuggestions([]);
+    try {
+      const res = await fetch(`${API_URL}/api/ai/suggest-message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ objective: `Write 3 short marketing messages for campaign: ${sendCampaign.name}` }),
+      });
+      const data = await res.json();
+      if (data.suggestions) {
+        setAiSuggestions(data.suggestions);
+      }
+    } catch (err) {
+      setSnackbar({ open: true, message: "⚠️ Failed to fetch AI suggestions", severity: "error" });
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -134,9 +182,9 @@ export default function CampaignsTable() {
                       </TableCell>
                       <TableCell align="center">
                         <Stack direction="row" spacing={1}>
-                          <Tooltip title="Edit"><IconButton color="primary"><EditIcon /></IconButton></Tooltip>
+                          <Tooltip title="Edit"><IconButton color="primary" onClick={() => { setEditCampaign(row); setOpen(true); }}><EditIcon /></IconButton></Tooltip>
                           <Tooltip title="Delete"><IconButton color="error" onClick={() => setDeleteId(row._id)}><DeleteIcon /></IconButton></Tooltip>
-                          <Tooltip title="Send"><IconButton color="success"><SendIcon /></IconButton></Tooltip>
+                          <Tooltip title="Send"><IconButton color="success" onClick={() => { setSendCampaign(row); setSendOpen(true); }}><SendIcon /></IconButton></Tooltip>
                         </Stack>
                       </TableCell>
                     </TableRow>
@@ -151,6 +199,54 @@ export default function CampaignsTable() {
       {/* Create/Edit Campaign */}
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
         <DialogContent><CampaignForm onCreated={handleCreated} editData={editCampaign} /></DialogContent>
+      </Dialog>
+
+      {/* Send Campaign Dialog */}
+      <Dialog open={sendOpen} onClose={() => setSendOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Send Campaign: {sendCampaign?.name}</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            multiline
+            minRows={3}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Write your campaign message here..."
+            sx={{ mb: 2 }}
+          />
+
+          <Button
+            variant="outlined"
+            startIcon={<AutoAwesomeIcon />}
+            onClick={getAISuggestions}
+            disabled={aiLoading}
+            sx={{ mb: 2 }}
+          >
+            {aiLoading ? "Getting Suggestions..." : "✨ Get AI Suggestions"}
+          </Button>
+
+          {aiSuggestions.length > 0 && (
+            <Stack spacing={1}>
+              {aiSuggestions.map((s, i) => (
+                <Paper
+                  key={i}
+                  onClick={() => setMessage(s)}
+                  sx={{
+                    p: 1.5,
+                    cursor: "pointer",
+                    "&:hover": { bgcolor: "#f5f5f5" },
+                  }}
+                >
+                  <Typography variant="body2">{s}</Typography>
+                </Paper>
+              ))}
+            </Stack>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSendOpen(false)}>Cancel</Button>
+          <Button onClick={handleSend} variant="contained" color="success">Send</Button>
+        </DialogActions>
       </Dialog>
 
       {/* Delete Dialog */}
